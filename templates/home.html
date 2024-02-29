@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{%- import "heading.html" as heading -%}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="text-center">
+	{% call heading::heading("Welcome!") %}
+	<p class="text-indigo-200 mt-4">This is a simple home screen.</p>
+</div>
+{% endblock %}
