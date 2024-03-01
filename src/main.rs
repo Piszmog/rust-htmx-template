@@ -16,10 +16,17 @@ const VERSION: &str = "dev";
 #[folder = "assets/"]
 struct Assets;
 
+mod embedded {
+    use refinery::embed_migrations;
+    embed_migrations!("migrations");
+}
+
 #[tokio::main]
 async fn main() {
-    let conn = Connection::open("./db.sqlite").await.unwrap();
-    db::init(&conn).await.unwrap();
+    let mut migrations_conn = rusqlite::Connection::open("./db.sqlite").unwrap();
+    embedded::migrations::runner()
+        .run(&mut migrations_conn)
+        .unwrap();
 
     let comression_layer = CompressionLayer::new().gzip(true);
 
@@ -27,7 +34,7 @@ async fn main() {
         .route("/", get(home))
         .nest_service("/assets", axum_embed::ServeEmbed::<Assets>::new())
         .layer(comression_layer)
-        .with_state(conn);
+        .with_state(Connection::open("./db.sqlite").await.unwrap());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
     axum::serve(listener, app).await.unwrap();
