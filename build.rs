@@ -8,7 +8,7 @@ const VERSION: &str = "dev";
 
 fn main() {
     let status = Command::new("tailwindcss")
-        .args(&[
+        .args([
             "-i",
             "./assets/styles/input.css",
             "-o",
